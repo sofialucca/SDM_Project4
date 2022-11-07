@@ -2,18 +2,14 @@ package edu.cs478.sofialucca.project4;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -25,6 +21,10 @@ public class MainActivity extends AppCompatActivity {
     static final int PLAYER_MOVE_2 = 2;
     static final int FIRST_MOVE = 0;
     static final int TERMINATED = 3;
+    static final String TIE_MSG = "GAME OVER: TIE";
+    static final String PLAYER1_MSG = "GAME OVER: PLAYER 1 WINS";
+    static final String PLAYER2_MSG = "GAME OVER: PLAYER 2 WINS";
+
     private ThreadP1 t1;
     private ThreadP2 t2;
     private TextView textWinner;
@@ -54,13 +54,13 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                             if(winner){
-                                textWinner.setText("GAME OVER: PLAYER 1 WINS");
+                                textWinner.setText(PLAYER1_MSG);
                                 textWinner.setTextColor(getResources().getColor(R.color.purple_700));
                                 /*t1.myHandler1.obtainMessage(TERMINATED).sendToTarget();
                                 t2.myHandler2.obtainMessage(TERMINATED).sendToTarget();*/
                                 postRunnables();
                             }else if(count == positions.size()) {
-                                textWinner.setText("GAME OVER: TIE");
+                                textWinner.setText(TIE_MSG);
                                 textWinner.setTextColor(getResources().getColor(R.color.black));
                                 /*t1.myHandler1.obtainMessage(TERMINATED).sendToTarget();
                                 t2.myHandler2.obtainMessage(TERMINATED).sendToTarget();*/
@@ -119,13 +119,13 @@ public class MainActivity extends AppCompatActivity {
 
                         }
                         if(winner){
-                            textWinner.setText("GAME OVER: PLAYER 2 WINS");
+                            textWinner.setText(PLAYER2_MSG);
                             textWinner.setTextColor(getResources().getColor(R.color.red));
                             /*t1.myHandler1.obtainMessage(TERMINATED).sendToTarget();
                             t2.myHandler2.obtainMessage(TERMINATED).sendToTarget();*/
                             postRunnables();
                         }else if(count == positions.size()) {
-                            textWinner.setText("GAME OVER: TIE");
+                            textWinner.setText(TIE_MSG);
                             textWinner.setTextColor(getResources().getColor(R.color.black));
                             /*t1.myHandler1.obtainMessage(TERMINATED).sendToTarget();
                             t2.myHandler2.obtainMessage(TERMINATED).sendToTarget();*/
@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-        positions = new HashMap<Integer,Integer>();
+        positions = new HashMap<>();
         for(int i =0; i< 9;i++){
             positions.put(i,0);
 
@@ -324,7 +324,7 @@ public class MainActivity extends AppCompatActivity {
         HashMap<Integer,Integer> positions;
         public void run(){
             Looper.prepare();
-            positions = new HashMap<Integer,Integer>();
+            positions = new HashMap<>();
 
 
             myHandler2 = new Handler(){
