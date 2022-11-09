@@ -170,9 +170,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 //Thread.currentThread().interrupt();
-                t1.positions = new ArrayList<>(9);
+                t1.positions1 = new ArrayList<>(9);
                 for(int i =0; i< 9;i++){
-                    t1.positions.add(i);
+                    t1.positions1.add(i);
                 }
             }
         };
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
                 //Thread.currentThread().interrupt();
                 //t1.positions = new ArrayList<>(9);
                 for(int i =0; i< 9;i++){
-                    t2.positions.put(i,0);
+                    t2.positions2.put(i,0);
                 }
             }
         };
@@ -237,12 +237,12 @@ public class MainActivity extends AppCompatActivity {
     public class ThreadP1 extends Thread {
 
         public Handler myHandler1;
-        private ArrayList<Integer> positions;
+        private ArrayList<Integer> positions1;
         Random random;
         public void run(){
             Log.i("THREAD1", "STARTED");
             Looper.prepare();
-            positions = new ArrayList<>(9);
+            positions1 = new ArrayList<>(9);
             random = new Random();
 
 
@@ -259,16 +259,16 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             }
 
-                            positions.remove(positions.indexOf(msg.arg1));
+                            positions1.remove(positions1.indexOf(msg.arg1));
 
-                            pos = random.nextInt(positions.size());
+                            pos = random.nextInt(positions1.size());
 
                             newMsg = uiHandler1.obtainMessage(PLAYER_MOVE_1);
-                            newMsg.arg1 = positions.get(pos);
+                            newMsg.arg1 = positions1.get(pos);
                             newMsg.obj = msg.obj;
 
                             Log.i("THREAD 1","Move " +newMsg.arg1);
-                            positions.remove(pos);
+                            positions1.remove(pos);
                             newMsg.sendToTarget();
                             break;
                         case FIRST_MOVE:
@@ -277,12 +277,12 @@ public class MainActivity extends AppCompatActivity {
                             } catch (InterruptedException e) {
                                 Log.i("THREAD1","Thread interrupted");
                             }
-                            positions = new ArrayList<>(9);
+                            positions1 = new ArrayList<>(9);
                             for(int i =0; i< 9;i++){
-                                positions.add(i);
+                                positions1.add(i);
                             }
                             pos = random.nextInt(9);
-                            positions.remove(pos);
+                            positions1.remove(pos);
                             newMsg = uiHandler1.obtainMessage(FIRST_MOVE);
                             newMsg.arg1 = pos;
                             newMsg.obj = nGame;
@@ -290,9 +290,9 @@ public class MainActivity extends AppCompatActivity {
                             newMsg.sendToTarget();
                             break;
                         case TERMINATED:
-                            positions = new ArrayList<>(9);
+                            positions1 = new ArrayList<>(9);
                             for(int i =0; i< 9;i++){
-                                positions.add(i);
+                                positions1.add(i);
                             }
                             break;
                     }
@@ -301,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
             };
 
             for(int i =0; i< 9;i++){
-                positions.add(i);
+                positions1.add(i);
             }
             try {
                 Thread.sleep(500);
@@ -309,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("THREAD1","Thread interrupted");
             }
             int pos = random.nextInt(9);
-            positions.remove(pos);
+            positions1.remove(pos);
             Message newMsg = uiHandler1.obtainMessage(FIRST_MOVE);
             newMsg.arg1 = pos;
             newMsg.obj = nGame;
@@ -321,10 +321,10 @@ public class MainActivity extends AppCompatActivity {
     public class ThreadP2 extends Thread {
 
         public Handler myHandler2;
-        HashMap<Integer,Integer> positions;
+        HashMap<Integer,Integer> positions2;
         public void run(){
             Looper.prepare();
-            positions = new HashMap<>();
+            positions2 = new HashMap<>();
 
 
             myHandler2 = new Handler(){
@@ -342,18 +342,19 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             }
                             //if already filled check for adjacents of it's side
-                            positions.put(msg.arg1,1);
+                            positions2.put(msg.arg1,1);
                             for(int i = 0; i<9;i++){
-                                if(positions.get(i) == 2){
+                                if(positions2.get(i) == 2){
                                     empty = false;
                                 }
-                                if(positions.get(i) == 0){
+                                if(positions2.get(i) == 0){
                                     if(firstFree == -1){
                                         firstFree = i;
                                     }
-
-                                    if((i-1>0 && i%3 != 0 && positions.get(i-1) == 2 )|| (i+1 <9 && i%2!=0 && positions.get(i+1) == 2) || (i+3<9 && positions.get(i+3)== 2)||(i-3>0 && positions.get(i-3) == 2)){
+                                    Log.i("T2","free " + i);
+                                    if((i-1>-1 && i%3 != 0 && positions2.get(i-1) == 2 )|| (i+1 <9 && i!=2 && i!=5 && positions2.get(i+1) == 2) || (i+3<9 && positions2.get(i+3)== 2)||(i-3>-1 && positions2.get(i-3) == 2)){
                                         newPos = i;
+                                        Log.i("T2","new pos" + i);
                                         break;
                                     }
                                 }
@@ -366,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
                             }else{
                                 newPos = firstFree;
                             }
-                            positions.put(newPos,2);
+                            positions2.put(newPos,2);
                             newMsg = uiHandler2.obtainMessage(PLAYER_MOVE_2);
                             newMsg.arg1 = newPos;
                             newMsg.obj = msg.obj;
@@ -374,16 +375,17 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case FIRST_MOVE:
                             for(int i =0; i< 9;i++){
-                                positions.put(i,0);
+                                positions2.put(i,0);
                             }
-                            positions.put(msg.arg1,1);
+                            positions2.put(msg.arg1,1);
                             try {
                                 Thread.sleep(2000);
                             } catch (InterruptedException e) {
                                 Log.i("THREAD2", "Woken up");
                             }
                             for(int i = 0; i<9;i++){
-                                if(positions.get(i) == 0){
+                                if(positions2.get(i) == 0){
+                                    Log.i("T2","first free first move" + i);
                                     if(firstFree == -1){
                                         firstFree = i;
                                         break;
@@ -393,7 +395,7 @@ public class MainActivity extends AppCompatActivity {
 
                             }
 
-                            positions.put(firstFree,2);
+                            positions2.put(firstFree,2);
                             newMsg = uiHandler2.obtainMessage(FIRST_MOVE);
                             newMsg.arg1 = firstFree;
                             newMsg.obj = msg.obj;
@@ -401,7 +403,7 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case TERMINATED:
                             for(int i =0; i< 9;i++){
-                                positions.put(i,0);
+                                positions2.put(i,0);
                             }
                             break;
                     }
