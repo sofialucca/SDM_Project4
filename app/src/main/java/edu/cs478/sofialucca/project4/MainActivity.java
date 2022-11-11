@@ -179,21 +179,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 //Thread.currentThread().interrupt();
-                t1.positions1 = new ArrayList<>(9);
-
-                for (int i = 0; i < 9; i++) {
-                    t1.positions1.add(i);
-                }
+                Thread.currentThread().interrupt();
+                Looper.myLooper().quit();
             }
         };
         terminatedRunnable2 = new Runnable() {
             @Override
             public void run() {
-                //Thread.currentThread().interrupt();
-                //t1.positions = new ArrayList<>(9);
-                for (int i = 0; i < 9; i++) {
-                    t2.positions2.put(i, 0);
-                }
+                Thread.currentThread().interrupt();
+                Looper.myLooper().quit();
+                //Thread.currentThread().Looper.getMainLooper().quit();
             }
         };
         positions = new HashMap<>();
@@ -212,15 +207,16 @@ public class MainActivity extends AppCompatActivity {
         textViewArray.add((TextView) findViewById(R.id.text_7));
         textViewArray.add((TextView) findViewById(R.id.text_8));
         textWinner = findViewById(R.id.textWinner);
-        t1 = new ThreadP1();
-        t2 = new ThreadP2();
+        /*t1 = new ThreadP1();
+        t2 = new ThreadP2();*/
         nGame = 0;
-        nMoves = 0;
         bttnNewGame.setOnClickListener(v -> {
             Log.i("UIThread", "Click on button");
+            Log.i("UIThread"," "+t1 );
             nGame++;
             nMoves = 0;
-            if ((t1.isAlive() || t2.isAlive()) && !(t1.isInterrupted() && t2.isInterrupted())) {
+
+            if (t1!= null && t2!= null &&(t1.isAlive() || t2.isAlive())) {
 
                 Log.i("UIThread", "Click on button alive threads");
                 for (int i = 0; i < 9; i++) {
@@ -231,12 +227,25 @@ public class MainActivity extends AppCompatActivity {
                 textWinner.setText("");
 
 
-                t1.myHandler1.obtainMessage(FIRST_MOVE).sendToTarget();
+                //t1.myHandler1.obtainMessage(FIRST_MOVE).sendToTarget();
+                postRunnables();
+                /*t1 = new ThreadP1();
+                t2 = new ThreadP2();*/
+            }else if(nGame > 1){
+                Log.i("UIThread", "Click on button interrupted threads");
+                for (int i = 0; i < 9; i++) {
+                    textViewArray.get(i).setBackgroundResource(R.drawable.border);
+                    positions.put(i, 0);
+                }
 
-            } else {
+                textWinner.setText("");
+            }
+                t1 = new ThreadP1();
+                t2 = new ThreadP2();
+             //else {
                 t1.start();
                 t2.start();
-            }
+            //}
 
 
         });
