@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
             boolean winner = false;
             Message newMsg;
 
-            Log.i("UI", "Move received " + msg.arg1);
             if ((int) msg.obj == nGame) {
                 nMoves++;
                 switch (what) {
@@ -178,7 +177,6 @@ public class MainActivity extends AppCompatActivity {
         terminatedRunnable1 = new Runnable() {
             @Override
             public void run() {
-                //Thread.currentThread().interrupt();
                 Thread.currentThread().interrupt();
                 Looper.myLooper().quit();
             }
@@ -188,7 +186,6 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 Thread.currentThread().interrupt();
                 Looper.myLooper().quit();
-                //Thread.currentThread().Looper.getMainLooper().quit();
             }
         };
         positions = new HashMap<>();
@@ -211,14 +208,12 @@ public class MainActivity extends AppCompatActivity {
         t2 = new ThreadP2();*/
         nGame = 0;
         bttnNewGame.setOnClickListener(v -> {
-            Log.i("UIThread", "Click on button");
-            Log.i("UIThread"," "+t1 );
+
             nGame++;
             nMoves = 0;
 
             if (t1!= null && t2!= null &&(t1.isAlive() || t2.isAlive())) {
 
-                Log.i("UIThread", "Click on button alive threads");
                 for (int i = 0; i < 9; i++) {
                     textViewArray.get(i).setBackgroundResource(R.drawable.border);
                     positions.put(i, 0);
@@ -227,12 +222,9 @@ public class MainActivity extends AppCompatActivity {
                 textWinner.setText("");
 
 
-                //t1.myHandler1.obtainMessage(FIRST_MOVE).sendToTarget();
                 postRunnables();
-                /*t1 = new ThreadP1();
-                t2 = new ThreadP2();*/
+
             }else if(nGame > 1){
-                Log.i("UIThread", "Click on button interrupted threads");
                 for (int i = 0; i < 9; i++) {
                     textViewArray.get(i).setBackgroundResource(R.drawable.border);
                     positions.put(i, 0);
@@ -242,10 +234,9 @@ public class MainActivity extends AppCompatActivity {
             }
                 t1 = new ThreadP1();
                 t2 = new ThreadP2();
-             //else {
                 t1.start();
                 t2.start();
-            //}
+
 
 
         });
@@ -265,7 +256,6 @@ public class MainActivity extends AppCompatActivity {
         Random random;
 
         public void run() {
-            Log.i("THREAD1", "STARTED");
             Looper.prepare();
             positions1 = new ArrayList<>(9);
             currentPositions1 = new ArrayList<>();
@@ -278,14 +268,14 @@ public class MainActivity extends AppCompatActivity {
                     int posRemove = -1;
                     Message newMsg;
                     switch (msg.what) {
+                        //randomly selects a position available
                         case PLAYER_MOVE:
                             try {
                                 Thread.sleep(2000);
                             } catch (InterruptedException e) {
-                                Log.i("THREAD1", "Woken up" + msg.arg1 + msg.obj);
+                                Log.i("THREAD1", "Woken up");
                                 break;
                             }
-                            Log.i("THREAD 1 msg", "Move " + msg.arg2);
                             positions1.remove(positions1.indexOf(msg.arg1));
                             if(msg.arg2 >-1){
                                 positions1.add(msg.arg2);
@@ -309,33 +299,7 @@ public class MainActivity extends AppCompatActivity {
                             newMsg.sendToTarget();
                             break;
 
-                        case FIRST_MOVE:
-                            try {
-                                Thread.sleep(500);
-                            } catch (InterruptedException e) {
-                                Log.i("THREAD1", "Thread interrupted");
-                            }
-                            positions1 = new ArrayList<>(9);
-                            currentPositions1 = new ArrayList<>();
-                            for (int i = 0; i < 9; i++) {
-                                positions1.add(i);
-                            }
-                            pos = random.nextInt(9);
-                            currentPositions1.add(positions1.remove(pos));
-                            newMsg = uiHandler1.obtainMessage(FIRST_MOVE);
-                            newMsg.arg1 = pos;
-                            newMsg.arg2 = posRemove;
-                            newMsg.obj = nGame;
 
-                            newMsg.sendToTarget();
-                            break;
-                        case TERMINATED:
-                            positions1 = new ArrayList<>(9);
-                            currentPositions1 = new ArrayList<>();
-                            for (int i = 0; i < 9; i++) {
-                                positions1.add(i);
-                            }
-                            break;
                     }
 
                 }
@@ -386,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
                                 Log.i("THREAD2", "Woken up");
                                 break;
                             }
-                            //if already filled check for adjacents of it's side
+                            //if already filled check for adjacents of its side
                             positions2.put(msg.arg1, 1);
                             if(msg.arg2 >-1){
                                 positions2.put(msg.arg2,0);
@@ -399,10 +363,8 @@ public class MainActivity extends AppCompatActivity {
                                     if (firstFree == -1) {
                                         firstFree = i;
                                     }
-                                    Log.i("T2", "free " + i);
                                     if ((i - 1 > -1 && i % 3 != 0 && positions2.get(i - 1) == 2) || (i + 1 < 9 && i != 2 && i != 5 && positions2.get(i + 1) == 2) || (i + 3 < 9 && positions2.get(i + 3) == 2) || (i - 3 > -1 && positions2.get(i - 3) == 2)) {
                                         newPos = i;
-                                        Log.i("T2", "new pos" + i);
                                         break;
                                     }
                                 }
@@ -441,7 +403,6 @@ public class MainActivity extends AppCompatActivity {
                             }
                             for (int i = 0; i < 9; i++) {
                                 if (positions2.get(i) == 0) {
-                                    Log.i("T2", "first free first move" + i);
                                     if (firstFree == -1) {
                                         firstFree = i;
                                         break;
@@ -459,13 +420,7 @@ public class MainActivity extends AppCompatActivity {
                             newMsg.arg2 = posRemove;
                             newMsg.sendToTarget();
                             break;
-                        case TERMINATED:
-                            currentPositions2 = new ArrayList<>();
 
-                            for (int i = 0; i < 9; i++) {
-                                positions2.put(i, 0);
-                            }
-                            break;
                     }
 
                 }
